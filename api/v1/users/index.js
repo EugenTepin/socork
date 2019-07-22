@@ -1,15 +1,16 @@
 var express = require('express')
 var router = express.Router();
-var postRouter = require('./id');
-var getPosts = require('./get.js');
-var postPosts = require('./post.js');
-var private = app_require('/api/v1/auth/checkToken.js');
+var userRouter = require('./id');
+var getUsers = require('./get.js');
+var postUsers = require('./post.js');
+var private = app_require('/utils/checkToken.js');
 
 router.route('/')
+    .post(postUsers)
     .all(private)
-    .get(getPosts)
-    .post(postPosts)
+    .get(getUsers)
 
-router.use('/:id', postRouter)
+
+router.use('/:id', userRouter)
 
 module.exports = router;

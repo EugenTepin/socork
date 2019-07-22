@@ -2,22 +2,39 @@
 global.app_require = function (name) {
     return require(__dirname + '/' + name);
 }
-var express = require('express')
-//var fs = require('fs')
-const port = 3000;
-const secret = 'do not tell anyone!';
-var cors = require('cors')
+const express = require('express');
+const Sequelize = require('sequelize');
+const config = require('./config.js');
+const cors = require('cors')
 var apiRouter = require('./api');
+
 var app = express();
 
-app.use(function (req, res, next) {
-    console.log('=========== new request ==============');
-    next()
+const sequelize = new Sequelize(config.db.name, config.db.user, config.db.password, {
+    host: config.db.host,
+    dialect: 'postgres'
 });
 
-app.use(cors());
-app.use(express.json());
-app.use('/api', apiRouter);
+sequelize.authenticate()
+    .then(function () {
+
+        app.use(function (req, res, next) {
+            console.log('=========== new request ==============');
+            next()
+        });
+        app.locals.db = sequelize;
+        app.use(cors());
+        app.use(express.json());
+        app.use('/api', apiRouter);
+        app.listen(config.app.port, () => console.log(`Example app listening on port ${config.app.port}!`));
+    })
+    .catch(function (e) {
+        console.log(e);
+    })
+
+
+
+
 
 
 
@@ -60,35 +77,4 @@ app.use('/api', apiRouter);
 
 
 
-// app.get('/', function (req, res) {
-//     res.sendFile('index.html', options, function (err) {
-//         if (err) {
-//             next(err)
-//         } else {
-//             //console.log('Sent:', fileName)
-//         }
-//     })
-// })
 
-// app.get('/signup.html', function (req, res) {
-//     res.sendFile('signup.html', options, function (err) {
-//         if (err) {
-//             next(err)
-//         } else {
-//             //console.log('Sent:', fileName)
-//         }
-//     })
-// })
-
-
-// app.get('/protected.html', function (req, res) {
-//     res.sendFile('protected.html', options, function (err) {
-//         if (err) {
-//             next(err)
-//         } else {
-//             //console.log('Sent:', fileName)
-//         }
-//     })
-// })
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
