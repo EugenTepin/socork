@@ -1,7 +1,9 @@
 var express = require('express')
 var router = express.Router();
-var versionRouter = require('./v2');
+var post = require('./post.js');
 
-router.use('/v2', versionRouter);
+router.route('/')
+    .post(post)
+
 
 module.exports = router;
